@@ -2,11 +2,13 @@
 
 use strict;
 use warnings;
-use Config::Properties;
+#use Config::Properties;
+#use IO::File;
 use XML::Writer;
-use IO::File;
+use CGI qw(:standard);
 
-my $output = new IO::File (">catalog.xml");
+#my $output = new IO::File (">catalog.xml");
+my $output = '';   # if outputing directly in CGI output
 my $base_dir = "/home/realtin5/catalog";
 my $writer = new XML::Writer (OUTPUT => $output);
 
@@ -60,4 +62,7 @@ while (readdir $dh_sport) {
 $writer->endTag('CATALOG');
 $writer->end();
 $output->close();
+
+#if creating XML for output
+print header('text/xml'), $output;
 
