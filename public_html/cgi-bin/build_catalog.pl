@@ -56,28 +56,28 @@ while (defined (my $dir_sport = readdir $dh_sport)) {
 	next unless -d "$base_dir/$dir_sport";
 	next if $dir_sport =~ /^\.\.?+$/;
 	my $spt_nme = $sport_keys{$dir_sport};
-	$writer->startTag ('SPORT', 'SPT_ID' => "'$dir_sport'", 'SPT_NME' => "'$spt_nme'");
+	$writer->startTag ('SPORT', 'SPT_ID' => "$dir_sport", 'SPT_NME' => "$spt_nme");
 
 	opendir (my $dh_level, "$base_dir/$dir_sport") || die "Cannot open $dir_sport $!\n";
 	while (defined (my $dir_level = readdir $dh_level)) {
 		next unless -d "$base_dir/$dir_sport/$dir_level";
 		next if $dir_level =~ /^\.\.?+$/;
 		my $lev_name = $level_keys{$dir_level};
-		$writer->startTag ('LEVEL', 'LEV_ID' => "'$dir_level'", 'LEV_NAME' => "'$lev_name'");
+		$writer->startTag ('LEVEL', 'LEV_ID' => "$dir_level", 'LEV_NAME' => "$lev_name");
 
 		opendir (my $dh_loc, "$base_dir/$dir_sport/$dir_level") || die "Cannot open $dir_level $!\n";
 		while (defined (my $dir_loc = readdir $dh_loc)) {
 			next unless -d "$base_dir/$dir_sport/$dir_level/$dir_loc";
 			next if $dir_loc =~ /^\.\.?+/;
 			my $loc_nme = $location_keys{$dir_loc};
-			$writer->startTag ('LOCATION', 'LOC_ID' => "'$dir_loc'", 'LOC_NAME', "'$loc_nme'");
+			$writer->startTag ('LOCATION', 'LOC_ID' => "$dir_loc", 'LOC_NAME', "$loc_nme");
 
 			opendir (my $dh_gmd, "$base_dir/$dir_sport/$dir_level/$dir_loc") || die "Cannot open $dir_loc $!\n";
 			while (defined (my $dir_gmd = readdir $dh_gmd)) {
 				next unless -d "$base_dir/$dir_sport/$dir_level/$dir_loc/$dir_gmd";
 				next if $dir_gmd =~ /^\.\.?+/;
 				my $gmd_name = $games{$dir_gmd};
-				$writer->startTag ('GAME', 'GMD_ID' => "'$dir_gmd'", 'GMD_NAME' => "'$gmd_name'");
+				$writer->startTag ('GAME', 'GMD_ID' => "$dir_gmd", 'GMD_NAME' => "$gmd_name");
 
 				opendir (my $dh_files, "$base_dir/$dir_sport/$dir_level/$dir_loc/$dir_gmd") || die " Cannot open $dir_gmd $!\n";
 				while (defined (my $file = readdir $dh_files)) {
@@ -85,7 +85,7 @@ while (defined (my $dir_sport = readdir $dh_sport)) {
 					next if $file eq "$dir_gmd.xml";
 					if (-f $file) {
 						$file =~ s/.xml$//;
-						#$writer->emptyTag ('STAT_FILE', 'SF' => "'$file'");
+						#$writer->emptyTag ('STAT_FILE', 'SF' => "$file");
 					}
 				}
 				$writer->endTag ('GAME');
