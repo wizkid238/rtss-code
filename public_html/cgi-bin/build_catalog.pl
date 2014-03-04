@@ -96,7 +96,7 @@ while (defined (my $dir_sport = readdir $dh_sport)) {
 					open my $fh, "<", "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$game" or die "Couldn't read '$game': $!\n";
 					my @line = grep { /GAME CLT_ID/ } <$fh>;
 					my ($gar1, $clt_id, $gar2, $gar3, $gar4, $gar5, $gar6, $gar7, $gar8, $nme, $gar10) = split /\"/, $line[0];
-					$writer->startTag ('GAME', 'SHR_ID' => "$clt_id", 'NME' => "$nme");
+					$writer->startTag ('GAME', 'SHR_ID' => "$clt_id", 'NME' => "$nme", 'GME_FILE' => "$game");
 					close $fh;
 
 					#next unless -d "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$dir_gmd";
