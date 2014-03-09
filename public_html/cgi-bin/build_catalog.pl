@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Config::Properties;
 use XML::Writer;
+use XML::Simple;
 use CGI qw(:standard);
 
 print header('text/xml');
@@ -93,11 +94,13 @@ while (defined (my $dir_sport = readdir $dh_sport)) {
 				while (defined (my $game = readdir $dh_gmd)) {
 					next unless $game =~ /xml$/;
 					#next if $game =~ /_SF_/;
-					open my $fh, "<", "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$game" or die "Couldn't read '$game': $!\n";
-					my @line = grep { /GAME CLT_ID/ } <$fh>;
-					my ($gar1, $clt_id, $gar2, $gar3, $gar4, $gar5, $gar6, $gar7, $gar8, $nme, $gar10) = split /\"/, $line[0];
+					my $filename = "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$game";
+					my $grep_line = "GAME";
+					my $grep_for = "CLT_ID";
+					my $clt_id = search_file ($filename, $grep_line, $grep_for);
+					$grep_for = "NME";
+					my $nme = search_file ($filename, $grep_line, $grep_for);
 					$writer->startTag ('GAME', 'SHR_ID' => "$clt_id", 'NME' => "$nme", 'GME_FILE' => "$game");
-					close $fh;
 
 					#next unless -d "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$dir_gmd";
 					#next if $dir_gmd =~ /^\.\.?+/;
@@ -127,3 +130,14 @@ while (defined (my $dir_sport = readdir $dh_sport)) {
 $writer->endTag('CATALOG');
 $writer->end();
 
+sub search_file {
+	my ($filename, $grep_line, $grep_for) = @_;
+	open my $fh, "<", "$filename" or die "Couldn't read '$filename': $!\n";
+	
+	my $data = XMLin ($fh);
+	#print Dumper ( $data );
+	#foreach my $attr (keys %{$data->{GAME}}) { 
+	my $attr = $data->{$grep_line}->{$grep_for};
+	close $fh;
+	return $attr;
+}
