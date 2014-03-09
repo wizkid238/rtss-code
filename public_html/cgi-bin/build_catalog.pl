@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Config::Properties;
 use XML::Writer;
-use XML::Simple;
+#use lib '.';
+use rtss; #qw(search_file);
 use CGI qw(:standard);
 
 print header('text/xml');
@@ -93,19 +94,13 @@ while (defined (my $dir_sport = readdir $dh_sport)) {
 				opendir (my $dh_gmd, "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn") || die "Cannot open $dir_sesn$!\n";
 				while (defined (my $game = readdir $dh_gmd)) {
 					next unless $game =~ /xml$/;
-					#next if $game =~ /_SF_/;
 					my $filename = "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$game";
 					my $grep_line = "GAME";
 					my $grep_for = "CLT_ID";
-					my $clt_id = search_file ($filename, $grep_line, $grep_for);
+					my $clt_id = rtss::search_file ($filename, $grep_line, $grep_for);
 					$grep_for = "NME";
-					my $nme = search_file ($filename, $grep_line, $grep_for);
+					my $nme = rtss::search_file ($filename, $grep_line, $grep_for);
 					$writer->startTag ('GAME', 'SHR_ID' => "$clt_id", 'NME' => "$nme", 'GME_FILE' => "$game");
-
-					#next unless -d "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$dir_gmd";
-					#next if $dir_gmd =~ /^\.\.?+/;
-					#my $gmd_name = $games{$dir_gmd};
-					#$writer->startTag ('GAME', 'SHR_ID' => "$dir_gmd", 'NME' => "$gmd_name");
 
 					#opendir (my $dh_files, "$base_dir/$dir_sport/$dir_level/$dir_league/$dir_sesn/$dir_gmd") || die " Cannot open $dir_gmd $!\n";
 					#while (defined (my $file = readdir $dh_files)) {
@@ -130,14 +125,3 @@ while (defined (my $dir_sport = readdir $dh_sport)) {
 $writer->endTag('CATALOG');
 $writer->end();
 
-sub search_file {
-	my ($filename, $grep_line, $grep_for) = @_;
-	open my $fh, "<", "$filename" or die "Couldn't read '$filename': $!\n";
-	
-	my $data = XMLin ($fh);
-	#print Dumper ( $data );
-	#foreach my $attr (keys %{$data->{GAME}}) { 
-	my $attr = $data->{$grep_line}->{$grep_for};
-	close $fh;
-	return $attr;
-}
